@@ -1,0 +1,14 @@
+{
+  "name": "plasma",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:local:base": "docker build --platform linux/amd64 -t plasma:test --build-arg=USER=root .",
+    "build:local:nvidia": "docker build --platform linux/amd64 -t plasma:nvidia-570-test --build-arg=PLASMA_VERSION=test -f nvidia.Dockerfile ."
+  },
+  "keywords": [],
+  "author": "Jo Colina <jo@jocolina.com>",
+  "license": "MIT",
+  "description": ""
+}

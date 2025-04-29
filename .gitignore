@@ -1,0 +1,11 @@
+node_modules/
+
+# Terraform
+**/.terraform/
+**/*.tfvars
+**/*.tfplan
+**/*.tfstate*
+
+**/aws.cred
+
+**/.next

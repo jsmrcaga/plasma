@@ -48,6 +48,20 @@ cards work a lot better/easier than Nvidia. Let me know!
 ### Nvidia Graphic Cards
 This project releases an Nivida-only image with 
 
+#### Test command (Docker)
+```sh
+sudo docker run -it --rm \
+	--entrypoint bash \
+	--runtime=nvidia \
+	--gpus all \
+	-v /dev/input:/dev/input \
+	-v /dev/uinput:/dev/uinput \
+	-v /dev/dri:/dev/dri \
+	--cap-add SYS_ADMIN \
+	plasma:nvidia-570-test
+```
+
 ## Docs
 
 Check the GitHub wiki
+
