@@ -2,6 +2,8 @@
 
 A _very_ lightweight Steam headless implementation.
 
+<img alt="Plasma black hole image" src="docs/banner.png"/>
+
 ## Motivation
 In short, I wanted to play KSP without installing it in my personal machine.
 
