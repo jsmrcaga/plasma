@@ -1,14 +1,20 @@
 # In CI this should be the "last"
 # version we built
 ARG PLASMA_VERSION=latest
+ARG VERSION=v0.0.0-dev-nvidia
 FROM plasma:${PLASMA_VERSION}
+
+LABEL \
+	org.opencontainers.image.authors="Jo Colina <@jsmrcaga>" \
+	org.opencontainers.image.version=${VERSION} \
+	org.opencontainers.image.title="plasma-nvidia"
 
 ARG NVIDIA_DRIVER_CAPABILITIES="all"
 ARG NVIDIA_VISIBLE_DEVICES="all"
 ARG NVIDIA_DRIVER_VERSION="570.133.07"
 
 # Configure fake display
-COPY ./config/video/xorg/xorg.conf /etc/X11/xorg.conf
+COPY ./config/video/xorg/xorg.nvidia.conf /etc/X11/xorg.conf
 
 # Automatically add graphic cards
 # for Container toolkit env variables
@@ -21,7 +27,15 @@ ENV \
 # * Install linux headers
 # * Install nvidia 32-bit libs and nvidia driver
 RUN usermod -aG messagebus lizard
-COPY ./src/setup/nvidia/install_nvidia_drivers.sh /etc/plasma-setup/install_nvidia_drivers.sh
-RUN bash /etc/plasma-setup/install_nvidia_drivers.sh
+
+# Copy script again in case we changed it in between images
+COPY --chmod=0755 ./src/setup/nvidia /plasma/setup/nvidia
+
+# Make sure we execute the script on startup
+RUN mv /plasma/setup/nvidia/x.sh /plasma/init.d/nvidia-x.sh
+
+RUN bash /plasma/setup/nvidia/nvidia.sh
+
+ENV NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION}
 
 ENTRYPOINT ["/plasma/init.sh"]
