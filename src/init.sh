@@ -34,5 +34,5 @@ shopt -u nullglob
 # Start X server
 /usr/bin/Xorg &
 
-# Start steam and sunshine
-steam && sunshine
+# Start sunshine
+sunshine

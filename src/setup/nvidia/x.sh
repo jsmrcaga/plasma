@@ -26,12 +26,12 @@ function config_x_for_nvidia {
   # @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/etc/cont-init.d/70-configure_xorg.sh#L8
   nvidia_gpu_hex_id=$(nvidia-smi --format=csv --query-gpu=pci.bus_id 2> /dev/null | sed -n 2p)
   nvidia_gpu_id=${nvidia_gpu_hex_id:-"00000000:01:00.0"}
-  # nvidia_gpu_hex_id="00000000:01:00.0"
   IFS=":." ARR_ID=(${nvidia_gpu_id})
   unset IFS
 
   bus_id=PCI:$((16#${ARR_ID[1]})):$((16#${ARR_ID[2]})):$((16#${ARR_ID[3]}))
 
+  # We do not use --use-display-device=None because it prevents sunshine from finding the display
   # --use-display-device=None
   # @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/etc/cont-init.d/70-configure_xorg.sh#L41C24-L41C49
   # @see https://developer.nvidia.com/docs/drive/drive-os/archives/6.0.4/linux/sdk/common/topics/window_system_stub/Togetoptionsformodifyingxorg.conf55.html
@@ -45,7 +45,6 @@ function config_x_for_nvidia {
     --no-sli \
     --no-base-mosaic \
     --only-one-x-screen \
-    --use-display-device=None \
     $EXTRA_X_NVIDIA_FLAGS
 
   # Add extra configuration
@@ -58,7 +57,8 @@ function config_x_for_nvidia {
     Option "AllowEmptyInitialConfiguration"\
     Option "ModeValidation" "NoMaxPClkCheck, NoEdidMaxPClkCheck, NoMaxSizeCheck, NoHorizSyncCheck, NoVertRefreshCheck, NoVirtualSizeCheck, NoTotalSizeCheck, NoDualLinkDVICheck, NoDisplayPortBandwidthCheck, AllowNon3DVisionModes, AllowNonHDMI3DModes, AllowNonEdidModes, NoEdidHDMI2Check, AllowDpInterlaced"' /etc/X11/xorg.conf
 
-  sed -i '/Section\s\+"Monitor"/a\    '"${MODELINE}" /etc/X11/xorg.conf
+  # sed -i '/Section\s\+"Monitor"/a\    '"${MODELINE}" /etc/X11/xorg.conf
+
   echo -e 'Section "ServerFlags"
   Option "AutoAddGPU" "false"
 EndSection' | tee -a /etc/X11/xorg.conf > /dev/null

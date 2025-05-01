@@ -27,7 +27,6 @@ ENV \
 # * Blacklist nouveau
 # * Install linux headers
 # * Install nvidia 32-bit libs and nvidia driver
-RUN usermod -aG messagebus lizard
 
 # Copy script again in case we changed it in between images
 COPY --chmod=0755 ./src/setup/nvidia /plasma/setup/nvidia
