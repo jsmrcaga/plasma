@@ -9,7 +9,22 @@ LABEL \
 # Install deps
 USER root
 RUN apt-get update
-RUN apt-get install x11-xserver-utils libgbm1 -y
+RUN apt-get install -y \
+	x11-xserver-utils \
+	xserver-xorg-core \
+	# libgbm1 is needed for sunshine but for some reason does not
+	# come with the base sunshine image
+	libgbm1 && \
+	apt-get autoremove && \
+	apt-get clean
+
+# User/permissions config for X. Needed for all GPU types
+COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
+
+# Configure display for AMD/Intel
+# Full credit to Josh5
+# @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/templates/xorg/xorg.dummy.conf
+COPY ./config/video/xorg/xorg.conf /etc/X11/xorg.conf
 
 # Install Steam
 #   * Order of operations is extramely important here
@@ -22,10 +37,18 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 		mesa-vulkan-drivers \
 		libglx-mesa0:i386 \
 		mesa-vulkan-drivers:i386 \
-		libgl1-mesa-dri:i386 &&\
+		libgl1-mesa-dri:i386 && \
+	apt-get autoremove && \
+	apt-get clean && \
+
 	# Make sure we have a steam binary ready to use
 	ln -sf /usr/games/steam /usr/bin/steam
 
-COPY ./src /plasma
+# Copy management scripts
+COPY --chmod=0755 ./src /plasma
+RUN mkdir -p /plasma/init.d /plasma/pre-hooks.d /plasma/post-hooks.d
+
+# Allows Steam and Sunshine to run
+ENV DISPLAY=:0
 
 ENTRYPOINT ["/plasma/init.sh"]
