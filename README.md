@@ -54,12 +54,15 @@ This project releases an Nivida-only image with
 ```sh
 sudo docker run -it --rm \
 	--entrypoint bash \
-	--runtime=nvidia \
+	--runtime=nvidia  \
 	--gpus all \
 	-v /dev/input:/dev/input \
 	-v /dev/uinput:/dev/uinput \
 	-v /dev/dri:/dev/dri \
 	--cap-add SYS_ADMIN \
+	-p 47984-47990:47984-47990/tcp \
+	-p 48010:48010 \
+	-p 47998-48000:47998-48000/udp \
 	plasma:nvidia-570-test
 ```
 
