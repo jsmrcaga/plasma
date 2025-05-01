@@ -40,7 +40,6 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 		libgl1-mesa-dri:i386 && \
 	apt-get autoremove && \
 	apt-get clean && \
-
 	# Make sure we have a steam binary ready to use
 	ln -sf /usr/games/steam /usr/bin/steam
 

@@ -51,3 +51,7 @@ chmod +x /tmp/NVIDIA_DRIVERS.run
     --no-install-libglvnd
 
 rm /tmp/NVIDIA_DRIVERS.run
+
+# Patch nvidia library
+# Using source to run in the same process
+source "/plasma/setup/nvidia/nvidia-nvenc-nvfbc.patch.sh"

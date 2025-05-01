@@ -1,8 +1,9 @@
 # In CI this should be the "last"
 # version we built
 ARG PLASMA_VERSION=latest
-ARG VERSION=v0.0.0-dev-nvidia
 FROM plasma:${PLASMA_VERSION}
+
+ARG VERSION=v0.0.0-dev-nvidia
 
 LABEL \
 	org.opencontainers.image.authors="Jo Colina <@jsmrcaga>" \
@@ -31,7 +32,7 @@ RUN usermod -aG messagebus lizard
 # Copy script again in case we changed it in between images
 COPY --chmod=0755 ./src/setup/nvidia /plasma/setup/nvidia
 
-# Make sure we execute the script on startup
+# Make sure we execute the script on startup from entrypoint
 RUN mv /plasma/setup/nvidia/x.sh /plasma/init.d/nvidia-x.sh
 
 RUN bash /plasma/setup/nvidia/nvidia.sh

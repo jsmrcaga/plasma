@@ -34,6 +34,7 @@ function config_x_for_nvidia {
 
   # --use-display-device=None
   # @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/etc/cont-init.d/70-configure_xorg.sh#L41C24-L41C49
+  # @see https://developer.nvidia.com/docs/drive/drive-os/archives/6.0.4/linux/sdk/common/topics/window_system_stub/Togetoptionsformodifyingxorg.conf55.html
   nvidia-xconfig \
     --virtual="${DISPLAY_W}x${DISPLAY_H}" \
     --depth="${DISPLAY_DEPTH:-24}" \
@@ -57,7 +58,7 @@ function config_x_for_nvidia {
     Option "AllowEmptyInitialConfiguration"\
     Option "ModeValidation" "NoMaxPClkCheck, NoEdidMaxPClkCheck, NoMaxSizeCheck, NoHorizSyncCheck, NoVertRefreshCheck, NoVirtualSizeCheck, NoTotalSizeCheck, NoDualLinkDVICheck, NoDisplayPortBandwidthCheck, AllowNon3DVisionModes, AllowNonHDMI3DModes, AllowNonEdidModes, NoEdidHDMI2Check, AllowDpInterlaced"' /etc/X11/xorg.conf
 
-  sed -i '/Section\s\+"Monitor"/a\  ' "${MODELINE}" /etc/X11/xorg.conf
+  sed -i '/Section\s\+"Monitor"/a\    '"${MODELINE}" /etc/X11/xorg.conf
   echo -e 'Section "ServerFlags"
   Option "AutoAddGPU" "false"
 EndSection' | tee -a /etc/X11/xorg.conf > /dev/null
