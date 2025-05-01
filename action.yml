@@ -1,0 +1,10 @@
+inputs:
+  nvidia-driver-version:
+    type: string
+    description: 'Full nvidia driver version (default: 570.133.07)'
+  nvidia-driver-capabilities:
+    type: string
+    description: 'List of driver capabilities (default: all)'
+  nvidia-visible-devices:
+    type: string
+    description: 'List of nvidia visible devices (default: all)'
