@@ -10,11 +10,22 @@ LABEL \
 USER root
 RUN apt-get update
 RUN apt-get install -y \
+	# X stuff
 	x11-xserver-utils \
 	xserver-xorg-core \
+	# X input
+	x11-xkb-utils \
+	xbindkeys \
+	xclip \
+	xdotool \
+	xserver-xorg-input-evdev \
+	xserver-xorg-input-libinput \
+	xserver-xorg-legacy \
 	# libgbm1 is needed for sunshine but for some reason does not
 	# come with the base sunshine image
 	libgbm1 && \
+	libinput-tools && \
+	# Cleanup
 	apt-get autoremove && \
 	apt-get clean
 
