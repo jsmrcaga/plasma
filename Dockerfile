@@ -36,6 +36,7 @@ COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
 # Full credit to Josh5
 # @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/templates/xorg/xorg.dummy.conf
 COPY ./config/video/xorg/xorg.conf /etc/X11/xorg.conf
+COPY ./config/input/xorg/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf
 
 # Install Steam
 #   * Order of operations is extramely important here
