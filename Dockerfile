@@ -6,6 +6,8 @@ LABEL \
 	org.opencontainers.image.version=${VERSION} \
 	org.opencontainers.image.title="plasma"
 
+ARG LOCALE=en_US.UTF-8
+
 # Install deps
 USER root
 
@@ -67,9 +69,18 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 	# Make sure we have a steam binary ready to use
 	ln -sf /usr/games/steam /usr/bin/steam
 
+
 # Copy management scripts
 COPY --chmod=0755 ./src /plasma
 RUN mkdir -p /plasma/init.d /plasma/pre-hooks.d /plasma/post-hooks.d
+
+# Handle locales
+RUN /plasma/setup/locales/gen_locale.sh ${LOCALE}
+ENV \
+	LANGUAGE=${LOCALE} \
+	LANG=${LOCALE} \
+	LC_ALL=${LOCALE}
+
 
 # Allows Steam and Sunshine to run
 ENV DISPLAY=:0
