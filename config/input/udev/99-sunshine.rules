@@ -1,0 +1,2 @@
+ACTION=="add|change", KERNEL=="event[0-9]*", ENV{ID_VENDOR_ID}=="beef", ENV{ID_INPUT}="1" ENV{ID_INPUT_KEYBOARD}="1"
+ACTION=="add|change", KERNEL=="event[0-9]*", ENV{ID_VENDOR_ID}=="046d", ENV{ID_INPUT}="1" ENV{ID_INPUT_MOUSE}="1"
