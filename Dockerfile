@@ -2,6 +2,8 @@
 # amd64
 FROM debian@sha256:4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
 
+
+ARG AUTHOR="Jo Colina <@jsmrcaga>"
 ARG VERSION=v0.0.0-dev
 
 ARG USERNAME=plasma
@@ -9,7 +11,7 @@ ARG PUID=1000
 ARG PGID=1000
 
 LABEL \
-	org.opencontainers.image.authors="Jo Colina <@jsmrcaga>" \
+	org.opencontainers.image.authors=${AUTHOR} \
 	org.opencontainers.image.version=${VERSION} \
 	org.opencontainers.image.title="plasma"
 
