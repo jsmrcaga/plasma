@@ -1,4 +1,6 @@
-FROM lizardbyte/sunshine:v2025.426.10137-debian-bookworm
+# debian:bookworm-slim
+# amd64
+FROM debian@sha256:4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
 
 ARG VERSION=v0.0.0-dev
 LABEL \
@@ -8,13 +10,15 @@ LABEL \
 
 ARG LOCALE=en_US.UTF-8
 
-# Install deps
+# Install sunshine and dependencies
 USER root
 
 RUN apt-get update && \
 	apt-get install -y \
 		# General
 		locales \
+		# Sunshine
+		va-driver-all \
 		# X stuff
 		x11-xserver-utils \
 		xserver-xorg-core \
@@ -30,9 +34,16 @@ RUN apt-get update && \
 		# come with the base sunshine image
 		libgbm1 \
 		libinput-tools && \
-		# Cleanup
-		apt-get autoremove && \
-		apt-get clean
+	# Cleanup
+	apt-get autoremove && \
+	apt-get clean
+
+COPY --from=lizardbyte/sunshine:v2025.426.10137-debian-bookworm /sunshine.deb /plasma/sunshine.deb
+
+# @see https://github.com/LizardByte/Sunshine/blob/3de3c299b23f64909bd6b3e42626ec818b0221d6/docker/debian-bookworm.dockerfile#L70
+RUN apt-get install -y --no-install-recommends /plasma/sunshine.deb && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/*
 
 # User/permissions config for X. Needed for all GPU types
 COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
