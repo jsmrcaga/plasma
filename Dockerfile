@@ -8,26 +8,29 @@ LABEL \
 
 # Install deps
 USER root
-RUN apt-get update
-RUN apt-get install -y \
-	# X stuff
-	x11-xserver-utils \
-	xserver-xorg-core \
-	# X input
-	x11-xkb-utils \
-	xbindkeys \
-	xclip \
-	xdotool \
-	xserver-xorg-input-evdev \
-	xserver-xorg-input-libinput \
-	xserver-xorg-legacy \
-	# libgbm1 is needed for sunshine but for some reason does not
-	# come with the base sunshine image
-	libgbm1 && \
-	libinput-tools && \
-	# Cleanup
-	apt-get autoremove && \
-	apt-get clean
+
+RUN apt-get update && \
+	apt-get install -y \
+		# General
+		locales \
+		# X stuff
+		x11-xserver-utils \
+		xserver-xorg-core \
+		# X input
+		x11-xkb-utils \
+		xbindkeys \
+		xclip \
+		xdotool \
+		xserver-xorg-input-evdev \
+		xserver-xorg-input-libinput \
+		xserver-xorg-legacy \
+		# libgbm1 is needed for sunshine but for some reason does not
+		# come with the base sunshine image
+		libgbm1 \
+		libinput-tools && \
+		# Cleanup
+		apt-get autoremove && \
+		apt-get clean
 
 # User/permissions config for X. Needed for all GPU types
 COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
@@ -45,9 +48,15 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 	dpkg --add-architecture i386 && \
 	apt-get update && \
 	apt-get install -y --no-install-recommends \
+		# @see https://developer.valvesoftware.com/wiki/Command_line_options#Steam
 		steam-installer \
+		dbus-x11 \
 		mesa-vulkan-drivers \
 		libglx-mesa0:i386 \
+		# this includes libgbm.so.1, otherwise steam dies
+		libgbm-dev:i386 \
+		# This is needed for some operations Steam does (throws an error otherwise)
+		xdg-user-dirs \
 		mesa-vulkan-drivers:i386 \
 		libgl1-mesa-dri:i386 && \
 	apt-get autoremove && \
