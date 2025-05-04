@@ -36,12 +36,16 @@ the containers. This also allows container boot to be faster.
 	- [Sunshine dockerfile](https://github.com/LizardByte/Sunshine/blob/c6f36474ba9b492eea2a60930ca7304ea96176af/docker/debian-bookworm.dockerfile)
 - Josh5 (Steam-headless)
 	- [Steam-headless Dockerfile](https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/Dockerfile.debian#L1)
+	- and _a lot_ of setup for both Nvidia and Xorg
 - keylase (NVENC and NvFBC patches)
 	- And enourmous shoutout to `vojtad` for commit [95dd542](https://github.com/keylase/nvidia-patch/commit/95dd542a8014578f91ffdd864a37b67b19c8948e) allowing us to pass driver version manually
 - e-dong (Virtual display Guide)
 	- Virtual display guide Reddit
 	- [Virtual display docs Sunshine](https://app.lizardbyte.dev/2023-09-14-remote-ssh-headless-sunshine-setup/?lng=en-US#virtual-display-setup)
-
+- goryny4
+	- For [evdev file for X11](https://gist.github.com/goryny4/014815ab73bede4f2184)
+- Gun_Demirbas
+	- Figuring out the [magic udev rules to make input work](https://discuss.linuxcontainers.org/t/headless-wayland-container-streaming-via-sunshine-sway-libinput-not-finding-input-devices/18852/7)
 
 ## Getting Started
 
@@ -61,10 +65,10 @@ sudo docker run -it --rm \
 	-v /dev/input:/dev/input \
 	-v /dev/uinput:/dev/uinput \
 	-v /dev/dri:/dev/dri \
-	--cap-add SYS_ADMIN \
 	-p 47984-47990:47984-47990/tcp \
 	-p 48010:48010 \
 	-p 47998-48000:47998-48000/udp \
+	--privileged \
 	plasma:nvidia-570-test
 ```
 
