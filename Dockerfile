@@ -3,6 +3,11 @@
 FROM debian@sha256:4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
 
 ARG VERSION=v0.0.0-dev
+
+ARG USERNAME=plasma
+ARG PUID=1000
+ARG PGID=1000
+
 LABEL \
 	org.opencontainers.image.authors="Jo Colina <@jsmrcaga>" \
 	org.opencontainers.image.version=${VERSION} \
@@ -80,7 +85,6 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 	# Make sure we have a steam binary ready to use
 	ln -sf /usr/games/steam /usr/bin/steam
 
-
 # Copy management scripts
 COPY --chmod=0755 ./src /plasma
 RUN mkdir -p /plasma/init.d /plasma/pre-hooks.d /plasma/post-hooks.d
@@ -92,8 +96,30 @@ ENV \
 	LANG=${LOCALE} \
 	LC_ALL=${LOCALE}
 
-
 # Allows Steam and Sunshine to run
 ENV DISPLAY=:0
+
+# Setup user
+RUN \
+	mkdir /home/${USERNAME} && \
+	# Add user with home and bash as shell
+	groupadd -g ${PGID} ${USERNAME} && \
+	useradd -d /home/${USERNAME} -s /bin/bash -u ${PUID} -g ${PGID} ${USERNAME} && \
+	chown -R ${USERNAME} /home/${USERNAME} && \
+	# Give user permissions for DBUS
+	sed -i "/  <user>/c\  <user>${USERNAME}</user>" /usr/share/dbus-1/system.conf && \
+	mkdir -p /var/run/dbus && \
+	chown -R ${PUID}:${PGID} /var/run/dbus/ && \
+	chmod -R 770 /var/run/dbus/ && \
+	# Give user permissions on input
+	mkdir -p /dev/uinput && \
+		# TODO: check that volume does not break these
+		# Otherwise add to init script
+	chmod 0666 /dev/uinput && \
+	# Create user config directories
+	mkdir -p /home/${USERNAME}/.config/sunshine && \
+	# Give user extra groups
+	usermod -aG audio,games,messagebus ${USERNAME}
+
 
 ENTRYPOINT ["/plasma/init.sh"]
