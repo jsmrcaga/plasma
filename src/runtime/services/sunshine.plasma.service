@@ -1,0 +1,17 @@
+[program:sunshine]
+priority=100
+
+autostart=true
+startsecs=1
+startretries=0
+autorestart=true
+
+user=%(ENV_USERNAME)s
+command=sunshine
+
+; logging
+stdout_logfile=/var/log/plasma.sunshine.log
+stdout_logfile_backups=0
+
+stderr_logfile=/var/log/plasma.sunshine.error
+stderr_logfile_backups=0

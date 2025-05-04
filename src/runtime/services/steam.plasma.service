@@ -1,0 +1,17 @@
+[program:steam]
+priority=100
+
+autostart=true
+startsecs=15
+startretries=3
+autorestart=true
+
+user=%(ENV_USERNAME)s
+command=steam -silent -tenfoot
+
+; logging
+stdout_logfile=/var/log/plasma.steam.log
+stdout_logfile_backups=0
+
+stderr_logfile=/var/log/plasma.steam.error
+stderr_logfile_backups=0

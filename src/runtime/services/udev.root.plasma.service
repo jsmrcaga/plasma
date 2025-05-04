@@ -1,0 +1,17 @@
+[program:udev]
+priority=10
+
+autostart=true
+startsecs=1
+startretries=0
+autorestart=true
+
+user=root
+command=/lib/systemd/systemd-udevd
+
+; logging
+stdout_logfile=/var/log/plasma.udev.log
+stdout_logfile_backups=0
+
+stderr_logfile=/var/log/plasma.udev.error
+stderr_logfile_backups=0
