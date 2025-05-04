@@ -24,6 +24,7 @@ RUN apt-get update && \
 	apt-get install -y \
 		# General
 		locales \
+		supervisor \
 		# Sunshine
 		va-driver-all \
 		# X stuff
@@ -76,7 +77,7 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 		dbus-x11 \
 		mesa-vulkan-drivers \
 		libglx-mesa0:i386 \
-		# this includes libgbm.so.1, otherwise steam dies
+		# this includes libgbm.so.1 32bit, otherwise steam dies
 		libgbm-dev:i386 \
 		# This is needed for some operations Steam does (throws an error otherwise)
 		xdg-user-dirs \
@@ -99,7 +100,10 @@ ENV \
 	LC_ALL=${LOCALE}
 
 # Allows Steam and Sunshine to run
-ENV DISPLAY=:0
+ENV DISPLAY=:0 \
+	XDG_RUNTIME_DIR=/tmp/xdg-runtime \
+	# Will be useful for supervisord
+	USERNAME=${USERNAME}
 
 # Setup user
 RUN \
@@ -123,5 +127,11 @@ RUN \
 	# Give user extra groups
 	usermod -aG audio,games,messagebus ${USERNAME}
 
+# Setup services to run & set them to run under our new user
+# Using supervisord
+# @see https://docs.docker.com/engine/containers/multi-service_container/#use-a-process-manager
+# @see https://supervisord.org/introduction.html#platform-requirements
+COPY ./config/supervisord/supervisord.conf /etc/supervisord/supervisord.conf
+RUN find /plasma/runtime/services -type f -name "*.plasma.service" -exec sed -i "s/<USERNAME>/${USERNAME}/g" {} +
 
 ENTRYPOINT ["/plasma/init.sh"]
