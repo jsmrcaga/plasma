@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Start X server
 # Credit for all flags to Josh5
 /usr/bin/Xorg \
@@ -20,4 +22,4 @@
     -nolisten tcp \
     -iglx \
     -verbose \
-    vt7 "${DISPLAY:?}" &
+    vt7 "${DISPLAY:?}"

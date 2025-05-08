@@ -11,14 +11,16 @@ else
 fi
 
 # Install Nvidia dependencies
-apt-get install -y \
+apt-get update && apt-get install -y \
   linux-headers-amd64 \
   libglvnd-dev \
   kmod \
   wget \
   pkg-config
 
-apt-get autoremove && apt-get clean
+apt-get clean autoclean -y && \
+  apt-get autoremove -y && \
+  rm -rf /var/lib/apt/lists/* /var/tmp/*
 
 # Blacklsit nouveau
 mkdir -p /etc/modprobe.d
