@@ -2,7 +2,6 @@
 # amd64
 FROM debian@sha256:4b50eb66f977b4062683ff434ef18ac191da862dbe966961bc11990cf5791a8d
 
-
 ARG AUTHOR="Jo Colina <@jsmrcaga>"
 ARG VERSION=v0.0.0-dev
 
@@ -17,9 +16,6 @@ LABEL \
 
 ARG LOCALE=en_US.UTF-8
 
-# Install sunshine and dependencies
-USER root
-
 RUN apt-get update && \
 	apt-get install -y \
 		# General
@@ -27,6 +23,11 @@ RUN apt-get update && \
 		supervisor \
 		# Sunshine
 		va-driver-all \
+		# Audio
+		pulseaudio \
+		alsa-utils \
+		libasound2 \
+		libasound2-plugins \
 		# X stuff
 		x11-xserver-utils \
 		xserver-xorg-core \
@@ -43,8 +44,8 @@ RUN apt-get update && \
 		libgbm1 \
 		libinput-tools && \
 	# Cleanup
-	apt-get autoremove && \
-	apt-get clean
+	apt-get clean autoclean -y && \
+	apt-get autoremove -y
 
 COPY --from=lizardbyte/sunshine:v2025.426.10137-debian-bookworm /sunshine.deb /plasma/sunshine.deb
 
@@ -61,6 +62,9 @@ COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
 # @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/templates/xorg/xorg.dummy.conf
 COPY ./config/video/xorg/xorg.conf /etc/X11/xorg.conf
 
+# Configure audio
+COPY ./config/audio/pulse/* /etc/pulse
+
 # Configure input rules
 COPY ./config/input/xorg/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf
 COPY ./config/input/udev/99-sunshine.rules /etc/udev/rules.d/99-sunshine.rules
@@ -71,7 +75,7 @@ COPY ./config/input/udev/99-sunshine.rules /etc/udev/rules.d/99-sunshine.rules
 RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
 	dpkg --add-architecture i386 && \
 	apt-get update && \
-	apt-get install -y --no-install-recommends \
+	apt-get install -y \
 		# @see https://developer.valvesoftware.com/wiki/Command_line_options#Steam
 		steam-installer \
 		dbus-x11 \
@@ -83,8 +87,9 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 		xdg-user-dirs \
 		mesa-vulkan-drivers:i386 \
 		libgl1-mesa-dri:i386 && \
-	apt-get autoremove && \
-	apt-get clean && \
+	apt-get clean autoclean -y && \
+	apt-get autoremove -y && \
+	rm -rf /var/lib/apt/lists/* && \
 	# Make sure we have a steam binary ready to use
 	ln -sf /usr/games/steam /usr/bin/steam
 
@@ -107,11 +112,15 @@ ENV DISPLAY=:0 \
 
 # Setup user
 RUN \
-	mkdir /home/${USERNAME} && \
+	# Create home and .config/sunshine too before chowning
+	mkdir -p /home/${USERNAME} && \
+	mkdir -p /home/${USERNAME}/.config/sunshine && \
+	mkdir -p /home/${USERNAME}/.config/pulse && \
 	# Add user with home and bash as shell
 	groupadd -g ${PGID} ${USERNAME} && \
-	useradd -d /home/${USERNAME} -s /bin/bash -u ${PUID} -g ${PGID} ${USERNAME} && \
-	chown -R ${USERNAME} /home/${USERNAME} && \
+	useradd -m -d /home/${USERNAME} -s /bin/bash -u ${PUID} -g ${PGID} ${USERNAME} && \
+	# Make sure the user has permissions on all their home things
+	chown -R ${USERNAME}:${USERNAME} /home/${USERNAME} && \
 	# Give user permissions for DBUS
 	sed -i "/  <user>/c\  <user>${USERNAME}</user>" /usr/share/dbus-1/system.conf && \
 	mkdir -p /var/run/dbus && \
@@ -119,19 +128,22 @@ RUN \
 	chmod -R 770 /var/run/dbus/ && \
 	# Give user permissions on input
 	mkdir -p /dev/uinput && \
-		# TODO: check that volume does not break these
-		# Otherwise add to init script
 	chmod 0666 /dev/uinput && \
-	# Create user config directories
-	mkdir -p /home/${USERNAME}/.config/sunshine && \
+	# Give permissions on pulseaudio
+	mkdir -p /tmp/pulse && \
+	chmod -R 0666 /tmp/pulse && \
 	# Give user extra groups
-	usermod -aG audio,games,messagebus ${USERNAME}
+	usermod -aG audio,games,messagebus,video,input ${USERNAME}
 
 # Setup services to run & set them to run under our new user
 # Using supervisord
 # @see https://docs.docker.com/engine/containers/multi-service_container/#use-a-process-manager
 # @see https://supervisord.org/introduction.html#platform-requirements
-COPY ./config/supervisord/supervisord.conf /etc/supervisord/supervisord.conf
-RUN find /plasma/runtime/services -type f -name "*.plasma.service" -exec sed -i "s/<USERNAME>/${USERNAME}/g" {} +
+COPY ./config/supervisord/supervisord.conf /etc/supervisor/supervisord.conf
+
+# Will be used by steam and sunshine
+ENV \
+	HOME=/home/${USERNAME} \
+	USER=${USERNAME}
 
 ENTRYPOINT ["/plasma/init.sh"]
