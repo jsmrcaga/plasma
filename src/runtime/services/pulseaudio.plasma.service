@@ -1,0 +1,18 @@
+[program:pulseaudio]
+priority=20
+
+autostart=false
+startsecs=2
+startretries=0
+autorestart=true
+
+user=%(ENV_USERNAME)s
+directory=/
+command=pulseaudio --exit-idle-time=-1
+
+; logging
+stdout_logfile=/var/log/pulse.plasma.log
+stdout_logfile_backups=0
+
+stderr_logfile=/var/log/pulse.plasma.error
+stderr_logfile_backups=0
