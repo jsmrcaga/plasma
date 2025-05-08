@@ -30,5 +30,18 @@ done
 
 shopt -u nullglob
 
-# Start sunshine
-exec supervisord -c /etc/supervisord/supervisord.conf --nodaemon --user root
+# Start supervisor in daemon mode
+# And manually start services because of dependencies
+
+# -c /etc/supervisor/supervisord.conf is implicit
+supervisord --user root
+
+## Bootstrap
+supervisorctl start udev  # runs as root
+supervisorctl start dbus
+supervisorctl start xorg
+supervisorctl start pulseaudio
+
+## Apps
+supervisorctl start steam
+supervisorctl start sunshine
