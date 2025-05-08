@@ -1,8 +1,8 @@
 [program:xorg]
 priority=50
 
-autostart=true
-startsecs=1
+autostart=false
+startsecs=2
 startretries=0
 autorestart=true
 
@@ -10,8 +10,8 @@ user=%(ENV_USERNAME)s
 command=/plasma/runtime/boot/xorg.sh
 
 ; logging
-stdout_logfile=/var/log/plasma.xorg.log
+stdout_logfile=/var/log/xorg.plasma.log
 stdout_logfile_backups=0
 
-stderr_logfile=/var/log/plasma.xorg.error
+stderr_logfile=/var/log/xorg.plasma.error
 stderr_logfile_backups=0

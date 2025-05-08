@@ -1,8 +1,8 @@
 [program:dbus]
 priority=10
 
-autostart=true
-startsecs=1
+autostart=false
+startsecs=2
 startretries=0
 autorestart=true
 
@@ -10,10 +10,10 @@ user=%(ENV_USERNAME)s
 command=dbus-daemon --system --nofork --nopidfile
 
 ; logging
-stdout_logfile=/var/log/plasma.dbus.log
+stdout_logfile=/var/log/dbus.plasma.log
 stdout_logfile_backups=0
 
-stderr_logfile=/var/log/plasma.dbus.error
+stderr_logfile=/var/log/dbus.plasma.error
 stderr_logfile_backups=0
 
 ; @see https://supervisord.org/configuration.html#program-x-section-values
