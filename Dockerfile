@@ -100,19 +100,18 @@ RUN \
 	# Add user with home and bash as shell
 	groupadd -g ${PGID} ${USERNAME} && \
 	useradd -m -d /home/${USERNAME} -s /bin/bash -u ${PUID} -g ${PGID} ${USERNAME} && \
-	# Make sure the user has permissions on all their home things
-	chown -R ${USERNAME}:${USERNAME} /home/${USERNAME} && \
 	# Give user permissions for DBUS
 	sed -i "/  <user>/c\  <user>${USERNAME}</user>" /usr/share/dbus-1/system.conf && \
 	mkdir -p /var/run/dbus && \
 	chown -R ${PUID}:${PGID} /var/run/dbus/ && \
-	chmod -R 770 /var/run/dbus/ && \
+	chmod -R 0770 /var/run/dbus/ && \
 	# Give user permissions on input
-	mkdir -p /dev/uinput && \
+	touch /dev/uinput && \
 	chmod 0666 /dev/uinput && \
 	# Give permissions on pulseaudio
 	mkdir -p /tmp/pulse && \
-	chmod -R 0666 /tmp/pulse && \
+	chown -R ${PUID}:${PGID} /tmp/pulse && \
+	chmod -R 0770 /tmp/pulse && \
 	# Give user extra groups
 	usermod -aG audio,games,messagebus,video,input ${USERNAME}
 
