@@ -17,6 +17,7 @@ LABEL \
 ARG LOCALE=en_US.UTF-8
 
 RUN apt-get update && \
+	# --no-install-recommends breaks the dbus/system.conf file
 	apt-get install -y \
 		# General
 		locales \
@@ -32,6 +33,7 @@ RUN apt-get update && \
 		x11-xserver-utils \
 		xserver-xorg-core \
 		# X input
+		dbus-x11 \
 		x11-xkb-utils \
 		xbindkeys \
 		xclip \
@@ -45,14 +47,17 @@ RUN apt-get update && \
 		libinput-tools && \
 	# Cleanup
 	apt-get clean autoclean -y && \
-	apt-get autoremove -y
+	apt-get autoremove -y && \
+	rm -rf /var/lib/apt/lists/* /var/tmp/*
 
 COPY --from=lizardbyte/sunshine:v2025.426.10137-debian-bookworm /sunshine.deb /plasma/sunshine.deb
 
 # @see https://github.com/LizardByte/Sunshine/blob/3de3c299b23f64909bd6b3e42626ec818b0221d6/docker/debian-bookworm.dockerfile#L70
 RUN apt-get install -y --no-install-recommends /plasma/sunshine.deb && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+	apt-get clean autoclean -y && \
+	apt-get autoremove -y && \
+	rm -rf /var/lib/apt/lists/* /var/tmp/* \
+	rm /plasma/sunshine.deb
 
 # User/permissions config for X. Needed for all GPU types
 COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
@@ -68,30 +73,6 @@ COPY ./config/audio/pulse/* /etc/pulse
 # Configure input rules
 COPY ./config/input/xorg/10-evdev.conf /etc/X11/xorg.conf.d/10-evdev.conf
 COPY ./config/input/udev/99-sunshine.rules /etc/udev/rules.d/99-sunshine.rules
-
-# Install Steam
-#   * Order of operations is extramely important here
-#   * non-free-firmware is a small optimization for the nvidia image
-RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
-	dpkg --add-architecture i386 && \
-	apt-get update && \
-	apt-get install -y \
-		# @see https://developer.valvesoftware.com/wiki/Command_line_options#Steam
-		steam-installer \
-		dbus-x11 \
-		mesa-vulkan-drivers \
-		libglx-mesa0:i386 \
-		# this includes libgbm.so.1 32bit, otherwise steam dies
-		libgbm-dev:i386 \
-		# This is needed for some operations Steam does (throws an error otherwise)
-		xdg-user-dirs \
-		mesa-vulkan-drivers:i386 \
-		libgl1-mesa-dri:i386 && \
-	apt-get clean autoclean -y && \
-	apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/* && \
-	# Make sure we have a steam binary ready to use
-	ln -sf /usr/games/steam /usr/bin/steam
 
 # Copy management scripts
 COPY --chmod=0755 ./src /plasma
@@ -145,5 +126,43 @@ COPY ./config/supervisord/supervisord.conf /etc/supervisor/supervisord.conf
 ENV \
 	HOME=/home/${USERNAME} \
 	USER=${USERNAME}
+
+# Configure Sunshine if necessary
+ARG SUNSHINE_USERNAME
+ARG SUNSHINE_PASSWORD
+RUN \
+	mkdir -p /home/${USERNAME}/.config/sunshine && \
+	HOME=/home/${USERNAME} /plasma/setup/sunshine/sunshine-creds.sh $SUNSHINE_USERNAME $SUNSHINE_PASSWORD
+
+COPY ./config/sunshine /home/${USERNAME}/.config/sunshine
+
+# Install Steam
+#   * Order of operations is extramely important here
+#   * non-free-firmware is a small optimization for the nvidia image
+RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+	dpkg --add-architecture i386 && \
+	apt-get update && \
+	apt-get install -y --no-install-recommends \
+		# @see https://developer.valvesoftware.com/wiki/Command_line_options#Steam
+		steam-installer \
+		gamescope \
+		mesa-vulkan-drivers \
+		libglx-mesa0:i386 \
+		# this includes libgbm.so.1 32bit, otherwise steam dies
+		libgbm-dev:i386 \
+		# This is needed for some operations Steam does (throws an error otherwise)
+		xdg-user-dirs \
+		mesa-vulkan-drivers:i386 \
+		libgl1-mesa-dri:i386 && \
+	apt-get clean autoclean -y && \
+	apt-get autoremove -y && \
+	rm -rf /var/lib/apt/lists/* /var/tmp/* && \
+	# Make sure we have a steam binary ready to use
+	ln -sf /usr/games/steam /usr/bin/steam
+
+RUN \
+	# Make sure the user has permissions on all their home things
+	# Since root will have created a ton of stuff in the meantime
+	chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
 
 ENTRYPOINT ["/plasma/init.sh"]

@@ -22,7 +22,8 @@ COPY ./config/video/xorg/xorg.nvidia.conf /etc/X11/xorg.conf
 # for Container toolkit env variables
 ENV \
 	NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES} \
-	NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES}
+	NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES} \
+	NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION}
 
 # Nvidia drivers section
 # * Blacklist nouveau
@@ -36,7 +37,5 @@ COPY --chmod=0755 ./src/setup/nvidia /plasma/setup/nvidia
 RUN mv /plasma/setup/nvidia/x.sh /plasma/init.d/nvidia-x.sh
 
 RUN bash /plasma/setup/nvidia/nvidia.sh
-
-ENV NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION}
 
 ENTRYPOINT ["/plasma/init.sh"]
