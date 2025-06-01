@@ -49,5 +49,5 @@ supervisorctl start xorg
 supervisorctl start pulseaudio
 
 ## Apps
-supervisorctl start steam
 supervisorctl start sunshine
+supervisorctl start steam
