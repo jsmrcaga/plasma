@@ -71,11 +71,6 @@ RUN apt-get update && \
 # User/permissions config for X. Needed for all GPU types
 COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
 
-# Configure display for AMD/Intel
-# Full credit to Josh5
-# @see https://github.com/Steam-Headless/docker-steam-headless/blob/14c770bce61db99c56592760c73c2ba454dab648/overlay/templates/xorg/xorg.dummy.conf
-COPY ./config/video/xorg/xorg.conf /etc/X11/xorg.conf
-
 # Configure audio
 COPY ./config/audio/pulse/* /etc/pulse
 
@@ -122,7 +117,7 @@ RUN \
 	chown -R ${PUID}:${PGID} /tmp/pulse && \
 	chmod -R 0770 /tmp/pulse && \
 	# Give user extra groups
-	usermod -aG audio,games,messagebus,video,input ${USERNAME}
+	usermod -aG audio,games,messagebus,video,input,tty ${USERNAME}
 
 # Setup services to run & set them to run under our new user
 # Using supervisord
