@@ -4,8 +4,8 @@
   },
   "apps": [
     {
-      "name": "All",
-      "image-path": "desktop.png"
+      "name": "Plasma",
+      "image-path": "sunshine-plasma.png"
     }
   ]
 }
