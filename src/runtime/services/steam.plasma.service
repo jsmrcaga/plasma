@@ -2,13 +2,13 @@
 priority=100
 
 autostart=false
-startsecs=15
-startretries=3
+startsecs=10
+startretries=0
 autorestart=true
 
 user=%(ENV_USERNAME)s
 directory=%(ENV_HOME)s
-command=steam -silent -tenfoot
+command=/usr/games/steam -nofriendsui
 
 ; logging
 stdout_logfile=/var/log/steam.plasma.log
