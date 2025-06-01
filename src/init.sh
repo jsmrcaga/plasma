@@ -39,6 +39,12 @@ shopt -u nullglob
 # Start supervisor in daemon mode
 # And manually start services because of dependencies
 
+# Sanity script before running services
+console_info "Running Sanity check script"
+/plasma/runtime/boot/sanity.sh
+console_ok "Sanity OK"
+
+console_success "All systems go. Starting processes..."
 # -c /etc/supervisor/supervisord.conf is implicit
 supervisord --user root
 
