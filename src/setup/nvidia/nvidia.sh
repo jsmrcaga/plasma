@@ -22,10 +22,6 @@ apt-get clean autoclean -y && \
   apt-get autoremove -y && \
   rm -rf /var/lib/apt/lists/* /var/tmp/*
 
-# Blacklsit nouveau
-mkdir -p /etc/modprobe.d
-echo "options nouveau modeset=0" > /etc/modprobe.d/blacklist-nouveau.conf
-
 # Download driver
 wget \
     -q --show-progress --progress=bar:force:noscroll \
@@ -50,7 +46,10 @@ chmod +x /tmp/NVIDIA_DRIVERS.run
     --no-backup \
     --no-check-for-alternate-installs \
     --no-libglx-indirect \
-    --no-install-libglvnd
+    --no-install-libglvnd \
+    1> /var/log/nvidia-setup.plasma.log \
+    2> /var/log/nvidia-setup.plasma.error
+
 
 rm /tmp/NVIDIA_DRIVERS.run
 

@@ -2,31 +2,37 @@
 
 set -e
 
+dirname="$( cd "$( dirname "$(readlink -f "$0")" )" &> /dev/null && pwd )"
+source "$dirname/setup/init/print.sh"
+
 # Allow no files in directories
 shopt -s nullglob
 
 # Run pre-hooks
+console_info "Running Pre-init scripts"
+
 for file in /plasma/pre-hooks.d/*.sh; do
+  console_debug "Running $file..."
   bash "$file"
 done
-
-for source in /plasma/pre-hooks.d/*.env.sh; do
-  source "$source"
-done
+console_ok "Pre-init scripts done"
 
 # Run plasma runtime init commands
+console_info "Running Init scripts"
+
 for file in /plasma/init.d/*.sh; do
+  console_debug "Running $file..."
   bash "$file"
 done
+console_ok "Init scripts done"
 
 # Run post-hooks
+console_info "Running Post-init scripts"
 for file in /plasma/post-hooks.d/*.sh; do
   bash "$file"
 done
+console_ok "Post-init scripts done"
 
-for source in /plasma/post-hooks.d/*.env.sh; do
-  source "$source"
-done
 
 shopt -u nullglob
 
