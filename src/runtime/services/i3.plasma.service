@@ -1,0 +1,18 @@
+[program:i3]
+priority=20
+
+autostart=false
+startsecs=3
+startretries=2
+autorestart=true
+
+user=%(ENV_USERNAME)s
+directory=%(ENV_HOME)s
+command=i3
+
+; logging
+stdout_logfile=/var/log/i3.plasma.log
+stdout_logfile_backups=0
+
+stderr_logfile=/var/log/i3.plasma.error
+stderr_logfile_backups=0
