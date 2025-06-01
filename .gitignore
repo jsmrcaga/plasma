@@ -9,3 +9,6 @@ node_modules/
 **/aws.cred
 
 **/.next
+
+# Specific file built for testing
+plasma.tar

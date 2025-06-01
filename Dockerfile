@@ -68,6 +68,9 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists/* /var/tmp/* && \
 	rm /plasma/sunshine.deb
 
+# Copy sunshine assets
+COPY ./src/setup/sunshine/assets/* /usr/share/sunshine
+
 # User/permissions config for X. Needed for all GPU types
 COPY ./config/video/xorg/Xwrapper.conf /etc/X11/Xwrapper.config
 
