@@ -20,7 +20,12 @@ RUN apt-get update && \
 	# --no-install-recommends breaks the dbus/system.conf file
 	apt-get install -y \
 		# General
+		wget \
+		nano \
 		locales \
+		# Some programs require a terminal emulator
+		xterm \
+		# Supervisor handles our user processes at startup
 		supervisor \
 		# Sunshine
 		va-driver-all \
@@ -41,6 +46,9 @@ RUN apt-get update && \
 		xserver-xorg-input-evdev \
 		xserver-xorg-input-libinput \
 		xserver-xorg-legacy \
+		# Allows testing graphics
+		xfishtank \
+		glmark2 \
 		# libgbm1 is needed for sunshine but for some reason does not
 		# come with the base sunshine image
 		libgbm1 \
@@ -53,10 +61,11 @@ RUN apt-get update && \
 COPY --from=lizardbyte/sunshine:v2025.426.10137-debian-bookworm /sunshine.deb /plasma/sunshine.deb
 
 # @see https://github.com/LizardByte/Sunshine/blob/3de3c299b23f64909bd6b3e42626ec818b0221d6/docker/debian-bookworm.dockerfile#L70
-RUN apt-get install -y --no-install-recommends /plasma/sunshine.deb && \
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends /plasma/sunshine.deb && \
 	apt-get clean autoclean -y && \
 	apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/* /var/tmp/* \
+	rm -rf /var/lib/apt/lists/* /var/tmp/* && \
 	rm /plasma/sunshine.deb
 
 # User/permissions config for X. Needed for all GPU types
@@ -138,26 +147,51 @@ COPY ./config/sunshine /home/${USERNAME}/.config/sunshine
 # Install Steam
 #   * Order of operations is extramely important here
 #   * non-free-firmware is a small optimization for the nvidia image
-RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware sid" >> /etc/apt/sources.list && \
 	dpkg --add-architecture i386 && \
 	apt-get update && \
 	apt-get install -y --no-install-recommends \
-		# @see https://developer.valvesoftware.com/wiki/Command_line_options#Steam
-		steam-installer \
 		gamescope \
-		mesa-vulkan-drivers \
-		libglx-mesa0:i386 \
+		# Some necessities for Steam
+		xfonts-base \
+		msttcorefonts \
+		fonts-liberation \
 		# this includes libgbm.so.1 32bit, otherwise steam dies
 		libgbm-dev:i386 \
 		# This is needed for some operations Steam does (throws an error otherwise)
 		xdg-user-dirs \
+		# Extra steam dependencies
+		# 	pcituils installs lspci for steam
+		pciutils \
+		libcurl4-openssl-dev:i386 \
+		libcurl4-openssl-dev:amd64 \
+		libc6:amd64 \
+		libc6:i386 \
+		libegl1:amd64 \
+		libegl1:i386 \
+		libgbm1:amd64 \
+		libgbm1:i386 \
+		libgl1-mesa-dri:amd64 \
+		libgl1-mesa-dri:i386 \
+		# This includes libGL.so.1
+		libgl1:i386 \
+		libgl1:amd64 \
+		steam-libs-amd64:amd64 \
+		steam-libs-i386:i386 \
+		# xdg-desktop-portal \
+		# xdg-desktop-portal-gtk \
+		# Etra drivers for 64 and 32 bits
+		mesa-vulkan-drivers \
 		mesa-vulkan-drivers:i386 \
-		libgl1-mesa-dri:i386 && \
+		libglx-mesa0:i386 \
+		libglx-mesa0:amd64 \
+		# Install steam
+		steam-installer && \
 	apt-get clean autoclean -y && \
 	apt-get autoremove -y && \
-	rm -rf /var/lib/apt/lists/* /var/tmp/* && \
+	rm -rf /var/lib/apt/lists/* /var/tmp/*
 	# Make sure we have a steam binary ready to use
-	ln -sf /usr/games/steam /usr/bin/steam
+	# ln -sf /usr/games/steam /usr/bin/steam
 
 RUN \
 	# Make sure the user has permissions on all their home things
