@@ -8,7 +8,7 @@ autorestart=true
 
 user=%(ENV_USERNAME)s
 directory=%(ENV_HOME)s
-command=/usr/games/steam -nofriendsui
+command=/usr/games/steam -nofriendsui -bigpicture
 
 ; logging
 stdout_logfile=/var/log/steam.plasma.log
