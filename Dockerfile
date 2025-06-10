@@ -23,6 +23,8 @@ RUN apt-get update && \
 		wget \
 		nano \
 		locales \
+		# Desktop interface
+		kwin-x11 \
 		# Some programs require a terminal emulator
 		xterm \
 		# Supervisor handles our user processes at startup
