@@ -39,7 +39,8 @@ In short: could not get it to work in ~45 minutes. At the time of writing (May 2
 and GitHub releases are from 2023, and mirror images had basic errors of file corruption.
 
 #### linuxserver/steam
-The last "nivida commit" is not hopeful. I did not even try the image out.
+The last "NVIDIA commit" is not hopeful. I ended up trying the image with an
+AMD card but I had no input and Steam was stuck in "webhelper is not responding" (comes pre-installed)
 
 #### Main differences
 
