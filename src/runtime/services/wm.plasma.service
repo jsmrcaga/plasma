@@ -1,4 +1,4 @@
-[program:i3]
+[program:wm]
 priority=20
 
 autostart=false
@@ -8,11 +8,11 @@ autorestart=true
 
 user=%(ENV_USERNAME)s
 directory=%(ENV_HOME)s
-command=i3
+command=kwin_x11
 
 ; logging
-stdout_logfile=/var/log/i3.plasma.log
+stdout_logfile=/var/log/wm.plasma.log
 stdout_logfile_backups=0
 
-stderr_logfile=/var/log/i3.plasma.error
+stderr_logfile=/var/log/wm.plasma.error
 stderr_logfile_backups=0

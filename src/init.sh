@@ -56,6 +56,6 @@ supervisorctl start pulseaudio
 
 ## Apps
 # We want sunshine before steam
-supervisorctl start i3
 supervisorctl start sunshine
+supervisorctl start wm
 supervisorctl start steam
