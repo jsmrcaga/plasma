@@ -28,9 +28,10 @@ fi
 # Install drivers
 dpkg --add-architecture i386
 apt-get update
-apt-get install -y --no-install-recommends \
+apt-get install -y --no-install-recommends -t bookworm-backports\
 	$driver_package \
 	firmware-amd-graphics \
+	mesa-utils \
 	libglx-mesa0 \
 	libglx-mesa0:i386 \
 	libgl1-mesa-dri \
@@ -46,7 +47,6 @@ apt-get install -y --no-install-recommends \
 apt-get clean autoclean -y && \
 	apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/*
-
 
 # Copy necessary config
 cp $xorg_config "/etc/X11/xorg.conf"

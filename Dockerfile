@@ -18,7 +18,7 @@ ARG LOCALE=en_US.UTF-8
 
 RUN apt-get update && \
 	# --no-install-recommends breaks the dbus/system.conf file
-	apt-get install -y \
+	apt-get install --no-install-recommends -y \
 		# General
 		wget \
 		nano \
@@ -147,17 +147,34 @@ COPY ./config/sunshine /home/${USERNAME}/.config/sunshine
 # Install Steam
 #   * Order of operations is extramely important here
 #   * non-free-firmware is a small optimization for the nvidia image
-RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware sid" >> /etc/apt/sources.list && \
+RUN \
+	echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+	echo "deb http://deb.debian.org/debian/ bookworm-backports main contrib non-free non-free-firmware" >> /etc/apt/sources.list.d/backports.list && \
 	dpkg --add-architecture i386 && \
 	apt-get update && \
+
+	# Install GL, Mesa & Vulkan drivers from backports
+	apt-get install -y --no-install-recommends -t bookworm-backports \
+		# this includes libgbm.so.1 32bit, otherwise steam dies
+		libgbm-dev:i386 \
+		libegl1:amd64 \
+		libegl1:i386 \
+		libglx-mesa0:i386 \
+		libglx-mesa0:amd64 \
+		libgl1-mesa-dri:amd64 \
+		libgl1-mesa-dri:i386 \
+		mesa-vulkan-drivers:amd64 \
+		mesa-vulkan-drivers:i386 \
+		libdrm-amdgpu1:amd64 \
+		libdrm-amdgpu1:i386 && \
+
+	# Install rest from normal repo
 	apt-get install -y --no-install-recommends \
 		gamescope \
 		# Some necessities for Steam
 		xfonts-base \
 		msttcorefonts \
 		fonts-liberation \
-		# this includes libgbm.so.1 32bit, otherwise steam dies
-		libgbm-dev:i386 \
 		# This is needed for some operations Steam does (throws an error otherwise)
 		xdg-user-dirs \
 		# Extra steam dependencies
@@ -167,24 +184,13 @@ RUN echo "deb http://deb.debian.org/debian/ bookworm main contrib non-free non-f
 		libcurl4-openssl-dev:amd64 \
 		libc6:amd64 \
 		libc6:i386 \
-		libegl1:amd64 \
-		libegl1:i386 \
 		libgbm1:amd64 \
 		libgbm1:i386 \
-		libgl1-mesa-dri:amd64 \
-		libgl1-mesa-dri:i386 \
 		# This includes libGL.so.1
 		libgl1:i386 \
 		libgl1:amd64 \
 		steam-libs-amd64:amd64 \
 		steam-libs-i386:i386 \
-		# xdg-desktop-portal \
-		# xdg-desktop-portal-gtk \
-		# Etra drivers for 64 and 32 bits
-		mesa-vulkan-drivers \
-		mesa-vulkan-drivers:i386 \
-		libglx-mesa0:i386 \
-		libglx-mesa0:amd64 \
 		# Install steam
 		steam-installer && \
 	apt-get clean autoclean -y && \
