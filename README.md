@@ -5,6 +5,10 @@ Essentially a spiritual fork of [docker-steam-headless](https://github.com/Steam
 
 <img alt="Plasma black hole image" src="docs/banner.png"/>
 
+> [!TIP]
+> If you're looking for the docs or configuration, please take a look
+> at our [wiki in GitHub](https://github.com/jsmrcaga/plasma/wiki)
+
 ## Motivation
 In short, I wanted to play KSP without installing it in my personal machine.
 
@@ -21,32 +25,40 @@ Since I'm homelabbing, my setup does not have a screen, so here we are.
 This project should work for you, _if you're willing to tinker and spend some time_.
 
 The main idea of this project is to allow you to build a durable and running image of headless Steam.
-Once that image is proven to work, you should have no more troubles getting it to run. So
+Once that image is proven to work, you should have no more trouble getting it to run. So
 if your server/computer/homelab/supercomputer dies because your little cousin tripped over the
 power cable, you should be safe to jsut reboot the machine and not worry about libraries
 not being up to date or getting a 404 from some driver url.
 
 ### What this is and isn't
 * This is a different implementation of docker-steam-headless
-* This is a "the less entropy the better" slution
-* This is not a magic solution to get steam working on your specific setup
-* This is not a plug-and-play solution (ie: don't expect that running this docker image will work in your setup)
-
+* This is a "the less entropy the better" solution
+* This is not a magic solution to get Steam working on your specific setup
+* This is not a plug-and-play solution (ie: don't expect that running this docker image will "just work")
 
 ### Alternative solutions
-#### josh5/steam-headless
+
+#### [Steam Headless](https://github.com/Steam-Headless/docker-steam-headless)
 In short: could not get it to work in ~45 minutes. At the time of writing (May 2025) the latest Docker Hub
 and GitHub releases are from 2023, and mirror images had basic errors of file corruption.
 
-#### linuxserver/steam
+#### [linuxserver/steamos](https://docs.linuxserver.io/images/docker-steamos/)
 The last "NVIDIA commit" is not hopeful. I ended up trying the image with an
-AMD card but I had no input and Steam was stuck in "webhelper is not responding" (comes pre-installed)
+AMD card but I had no input at all and Steam was stuck in "webhelper is not responding" (comes pre-installed)
+
+#### [Bazzite](https://bazzite.gg/)
+Bazzite is a Linux distribution meant to look and behave like SteamOS.
+it does allow you to build from Containerfiles, so it might work as a replacement 
+for headless setups with some tinkering.
+
+#### [HoloISO](https://github.com/HoloISO/releases)
+Similar to Bazzite, HoloISO is a Linux distribution meant to look and behave like SteamOS.
+If you want to just install this to a machine, i'd suggest trying out Bazzite or HoloISO. 
 
 #### Main differences
 
 The main differences with these projects is that this project is not trying
-to work "easily" for everyone. This is for targeted setups (headless, nvidia)
-but should work a lot more often.
+to work "easily" for everyone. This is for targeted setups (notably headless).
 
 For example, the Nvidia Docker images come with drivers pre-installed (and you
 can build your own) to prevent any driver installation issues when executing
@@ -72,12 +84,17 @@ the containers. This also allows container boot to be faster.
 
 ## Getting Started
 
-### Intel/AMD Graphic Cards
-No idea if this works. Most guides seem to suggest that Intel and AMD
-cards work a lot better/easier than Nvidia. Let me know!
+### AMD Graphic Cards
+Plasma has been tested with an AMD Radeon Pro WX 2100.
+Configuring Plasma to run with an AMD card is rather easy.
 
 ### Nvidia Graphic Cards
-This project releases an Nivida-only image with 
+Plasma has been tested with an Nvidia Quadro P400.
+Configuring for Nvidia is considerably more involved than AMD, but 
+it does work well.
+
+### Intel GPUs
+Intel GPUs are untested. Use at your own discretion.
 
 #### Test command (Docker)
 
@@ -114,5 +131,5 @@ sudo docker run -it --rm \
 
 ## Docs
 
-Check the GitHub wiki
+Check the [GitHub Wiki](https://github.com/jsmrcaga/plasma/wiki)!
 
