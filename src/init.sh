@@ -8,6 +8,10 @@ source "$dirname/setup/init/print.sh"
 # Allow no files in directories
 shopt -s nullglob
 
+console_info "Configuring Home, copying files from /home/default to /home/$USER"
+source /plasma/runtime/boot/home.sh
+console_ok "Home files copied!"
+
 # Run pre-hooks
 console_info "Running Pre-init scripts"
 

@@ -104,8 +104,9 @@ ENV DISPLAY=:0 \
 RUN \
 	# Create home and .config/sunshine too before chowning
 	mkdir -p /home/${USERNAME} && \
-	mkdir -p /home/${USERNAME}/.config/sunshine && \
-	mkdir -p /home/${USERNAME}/.config/pulse && \
+	mkdir -p /home/default && \
+	mkdir -p /home/default/.config/sunshine && \
+	mkdir -p /home/default/.config/pulse && \
 	# Add user with home and bash as shell
 	groupadd -g ${PGID} ${USERNAME} && \
 	useradd -m -d /home/${USERNAME} -s /bin/bash -u ${PUID} -g ${PGID} ${USERNAME} && \
@@ -132,17 +133,17 @@ COPY ./config/supervisord/supervisord.conf /etc/supervisor/supervisord.conf
 
 # Will be used by steam and sunshine
 ENV \
-	HOME=/home/${USERNAME} \
+	HOME=/home/default \
 	USER=${USERNAME}
 
 # Configure Sunshine if necessary
 ARG SUNSHINE_USERNAME
 ARG SUNSHINE_PASSWORD
-RUN \
-	mkdir -p /home/${USERNAME}/.config/sunshine && \
-	HOME=/home/${USERNAME} /plasma/setup/sunshine/sunshine-creds.sh $SUNSHINE_USERNAME $SUNSHINE_PASSWORD
 
-COPY ./config/sunshine /home/${USERNAME}/.config/sunshine
+# Copy to /home/default so that the image can contain everything once built
+RUN HOME=/home/default /plasma/setup/sunshine/sunshine-creds.sh $SUNSHINE_USERNAME $SUNSHINE_PASSWORD
+
+COPY ./config/sunshine /home/default/.config/sunshine
 
 # Install Steam
 #   * Order of operations is extramely important here
@@ -196,8 +197,9 @@ RUN \
 	apt-get clean autoclean -y && \
 	apt-get autoremove -y && \
 	rm -rf /var/lib/apt/lists/* /var/tmp/*
-	# Make sure we have a steam binary ready to use
-	# ln -sf /usr/games/steam /usr/bin/steam
+
+# Re-set home to the actual user
+ENV HOME=/home/${USERNAME}
 
 RUN \
 	# Make sure the user has permissions on all their home things
