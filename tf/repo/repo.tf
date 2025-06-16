@@ -11,4 +11,11 @@ module repo {
   topics = ["steam", "sunshine", "gaming", "streaming"]
 
   has_wiki = true
+
+  actions = {
+    secrets = {
+      DOCKER_USERNAME = var.github.secrets.docker_username
+      DOCKER_PASSWORD = var.github.secrets.docker_password
+    }
+  }
 }
