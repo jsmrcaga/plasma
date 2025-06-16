@@ -1,0 +1,122 @@
+name: Build Plasma
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+  release:
+    types:
+      - published
+
+
+jobs:
+  build-plasma-base:
+    name: Build base image
+    runs-on: ubuntu-latest
+
+    outputs:
+      base-version: ${{ steps.base-tag.outputs.version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Base image tag
+        id: base-tag
+        run: |
+          version=""
+          if [[ ${{ github.event_name }} == 'release' ]]; then
+            version=${{ github.ref_name }}
+          else
+            version=pr-${{ github.event.pull_request.number }}
+          fi
+
+          echo "::notice title=Docker tag::Using base docker version: ${version}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build base image
+        run: |
+          docker build \
+            -t jsmrcaga/plasma:${{ steps.base-tag.outputs.version }} \
+            --platform linux/amd64 \
+            --build-arg=VERSION=${{ steps.base-tag.outputs.version }} \
+            --build-arg=SUNSHINE_USERNAME=plasma \
+            --build-arg=SUNSHINE_PASSWORD=mellon \
+            -f Dockerfile \
+            .
+
+      - name: Publish base image
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          docker tag jsmrcaga/plasma:${{ steps.base-tag.outputs.version }} jsmrcaga/plasma:latest
+          docker push jsmrcaga/plasma --all-tags
+
+      - name: Save image
+        if: ${{ github.event_name == 'pull_request' }}
+        run: docker save -o plasma-cache.tar jsmrcaga/plasma:${{ steps.base-tag.outputs.version }}
+
+      - name: Cache image
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: plasma-cache
+          path: ./plasma-cache.tar
+          retention-days: 1
+          compression-level: 0
+
+  build-plasma-gpu:
+    name: Build GPU images
+    runs-on: ubuntu-latest
+
+    needs:
+      - build-plasma-base
+
+    strategy:
+      matrix:
+        gpu-type:
+          # radeon
+          - gpu: AMD
+            driver: "1.0"
+          # amdgpu
+          - gpu: AMD
+            driver: "4.0"
+          # Latest prod
+          - gpu: NVIDIA
+            driver: "570.144"
+          # Legacy
+          - gpu: NVIDIA
+            driver: "470.256.02"
+
+    steps:
+      - name: Download Cached image
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: plasma-cache
+          path: ./
+          
+      - name: Load cached image
+        if: ${{ github.event_name == 'pull_request' }}
+        run: docker load -i plasma-cache.tar
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./
+        name: Build GPU image
+        with:
+          docker-username: ${{ secrets.DOCKER_USERNAME }}
+          docker-password: ${{ secrets.DOCKER_PASSWORD }}
+          version: ${{ needs.build-plasma-base.outputs.base-version }}-${{ matrix.gpu-type.gpu }}-${{ matrix.gpu-type.driver }}
+          # This, not being 'local', will prevent the action from building a base image
+          plasma-base: jsmrcaga/plasma
+          plasma-version: ${{ needs.build-plasma-base.outputs.base-version }}
+          gpu: ${{ matrix.gpu-type.gpu }}
+          amd-gcn-version: ${{ matrix.gpu-type.driver }}
+          nvidia-driver-version: ${{ matrix.gpu-type.driver }}
+          docker-push: ${{ github.event_name == 'release' && 'yes' || 'no' }}
