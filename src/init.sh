@@ -57,7 +57,13 @@ supervisorctl start pulseaudio
 # We want sunshine before steam
 supervisorctl start sunshine
 supervisorctl start wm
-supervisorctl start glmark2
+
+if [[ -n $GPU_PRIME ]]; then
+  console_info "Priming with glmark2..."
+  supervisorctl start glmark2
+  console_info "Stopping glmark2..."
+  supervisorctl stop glmark2
+fi
 supervisorctl start steam
 
 # Send notification stating that Plasma is now ready to use

@@ -22,3 +22,5 @@ COPY ./config/video/xorg/xorg.radeon.conf /plasma/config/amd/xorg.radeon.conf
 COPY --chmod=0755 ./src/setup/amd /plasma/setup/amd
 RUN bash /plasma/setup/amd/amd.sh
 
+# Run glmark2 to prime GPU
+ENV GPU_PRIME=yes
