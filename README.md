@@ -111,6 +111,7 @@ sudo docker run -it --rm \
 	-p 48010:48010 \
 	-p 47998-48000:47998-48000/udp \
 	--privileged \
+	-v <some directory>:/home/<your user> \
 	plasma:nvidia-570-test
 ```
 
@@ -126,7 +127,8 @@ sudo docker run -it --rm \
 	-p 48010:48010 \
 	-p 47998-48000:47998-48000/udp \
 	--privileged \
-	plasma:amd-gcn1.0-test
+	-v <some directory>:/home/<your user> \
+	plasma:amd-test
 ```
 
 ## Docs
