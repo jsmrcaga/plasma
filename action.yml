@@ -1,0 +1,198 @@
+name: Plasma - Image builder
+author: Jo Colina
+description: A GitHub Action allowing you to build custom Plasma images
+
+inputs:
+  #########
+  # Config
+  #########
+  docker-username:
+    required: true
+    description: Username to login to docker registry
+
+  docker-password:
+    required: true
+    description: Password to login to docker registry
+
+  docker-registry:
+    required: false
+    description: Registry to which to push the output image
+
+  docker-push:
+    required: false
+    default: "yes"
+    description: If this action should push the image
+
+  #########
+  #  Base
+  #########
+  author:
+    required: false
+    default: Jo Colina
+    description: The image author
+
+  version:
+    required: true
+    description: the image version
+
+  username:
+    required: false
+    default: plasma
+    description: The Linux user username (default plasma)
+  locale:
+    required: false
+    default: en_US.UTF-8
+    description: The Linux system locale (default en_US.UTF-8)
+  puid:
+    required: false
+    default: '1000'
+    description: The user Linux ID
+  pgid:
+    required: false
+    default: '1000'
+    description: The group Linux ID
+  sunshine-username:
+    required: false
+    default: plasma
+    description: The Sunshine UI username
+  sunshine-password:
+    required: false
+    default: mellon
+    description: The Sunshine UI password
+
+  ##########
+  # All GPUs
+  ##########
+
+  gpu:
+    required: true
+    description: Type of GPU. Allowed values are AMD, INTEL or NVIDIA
+
+  plasma-base:
+    required: false
+    description: Use 'local' if you want to build the base image here. Only if you want to use a custom base image from a custom repo
+    default: ghcr.io/jsmrcaga/plasma-base
+
+  plasma-version:
+    required: false
+    description: Use 'latest' (default value) if you want to build the base image here. The version of your custom image
+    default: latest
+
+
+  #########
+  #  AMD
+  #########
+  amd-gcn-version:
+    required: false
+    description: The GCN version of your card. 1.0 and 1.1 use the `radeon` driver
+    default: "4.0"
+
+  #########
+  # NVIDIA
+  #########
+  nvidia-driver-version:
+    required: false
+    description: The version of the nvidia driver your host machine is using
+    default: "570.144"
+
+  nvidia-driver-capabilities:
+    required: false
+    description: Capabilities to pass to the container. Advanced usage.
+    default: all
+
+  nvidia-visible-devices:
+    required: false
+    description: GPUs to show to the container. Use this is you have multiple GPUs
+    default: all
+
+  #########
+  # INTEL
+  #########
+
+runs:
+  using: composite
+  steps:
+    - name: Login to Docker registry
+      shell: bash
+      run: echo ${{ inputs.docker-password }} | docker login -u ${{ inputs.docker-username }} --password-stdin ${{ inputs.docker-registry }}
+
+    - name: Get GPU Docker image tag
+      id: image-tag
+      shell: bash
+      run: |
+        set -e
+        registry=""
+        docker_registry="${{ inputs.docker-registry }}"
+        if [[ -n $docker_registry  ]]; then
+          registry="${{ inputs.docker-registry }}/"
+        fi
+
+        tag="${registry}${{ inputs.docker-username }}/plasma:${{ inputs.version }}"
+        echo "::notice title=Docker tag::Using docker tag: ${tag}"
+        echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+    - name: Get GPU Dockerfile
+      id: dockerfile
+      shell: bash
+      run: |
+        set -e
+        dockerfile=""
+        gpu="${{ inputs.gpu }}"
+        if [[ $gpu == 'AMD' ]]; then
+          dockerfile="amd.Dockerfile"
+        elif [[ $gpu == 'NVIDIA' ]]; then
+          dockerfile="nvidia.Dockerfile"
+        elif [[ $gpu == 'INTEL' ]]; then
+          dockerfile="intel.dockerfile"
+        fi
+
+        if [[ -z $dockerfile ]]; then
+          echo "::error title=Invalid GPU type::GPU can only be one of AMD, NVIDIA or INTEL, got: '${{ inputs.gpu }}'"
+          exit 1
+        fi
+
+        echo "dockerfile=${dockerfile}" >> "$GITHUB_OUTPUT"
+
+    - name: Build base image
+      if: ${{ inputs.plasma-base == 'local' && inputs.plasma-version == 'latest' }}
+      shell: bash
+      run: |
+        docker build \
+          -t local:latest \
+          --platform linux/amd64 \
+          --build-arg=AUTHOR="${{ inputs.author }}" \
+          --build-arg=VERSION=${{ inputs.version }} \
+          --build-arg=USERNAME=${{ inputs.username }} \
+          --build-arg=PUID=${{ inputs.puid }} \
+          --build-arg=PGID=${{ inputs.pgid }} \
+          --build-arg=LOCALE=${{ inputs.locale }} \
+          --build-arg=SUNSHINE_USERNAME=${{ inputs.sunshine-username }} \
+          --build-arg=SUNSHINE_PASSWORD=${{ inputs.sunshine-password }} \
+          -f Dockerfile \
+          .
+
+    - name: Build ${{ inputs.gpu }} image
+      shell: bash
+      run: |
+        docker build \
+          -t ${{ steps.image-tag.outputs.tag }} \
+          --platform linux/amd64 \
+          --build-arg=AUTHOR="${{ inputs.author }}" \
+          --build-arg=VERSION=${{ inputs.version }} \
+          --build-arg=PLASMA_BASE=${{ inputs.plasma-base }} \
+          --build-arg=PLASMA_VERSION=${{ inputs.plasma-version }} \
+          --build-arg=AMD_GCN_VERSION=${{ inputs.amd-gcn-version }} \
+          --build-arg=NVIDIA_DRIVER_CAPABILITIES=${{ inputs.nvidia-driver-capabilities }} \
+          --build-arg=NVIDIA_VISIBLE_DEVICES=${{ inputs.nvidia-visible-devices }} \
+          --build-arg=NVIDIA_DRIVER_VERSION=${{ inputs.nvidia-driver-version }} \
+          -f ${{ steps.dockerfile.outputs.dockerfile }} \
+          .
+
+    - name: Push image
+      if: ${{ inputs.docker-push == 'yes' }}
+      shell: bash
+      run: docker push ${{ steps.image-tag.outputs.tag }}
+
+branding:
+  icon: circle
+  color: gray-dark
