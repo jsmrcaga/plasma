@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 dirname="$( cd "$( dirname "$(readlink -f "$0")" )" &> /dev/null && pwd )"
@@ -23,7 +22,6 @@ console_ok "Pre-init scripts done"
 
 # Run plasma runtime init commands
 console_info "Running Init scripts"
-
 for file in /plasma/init.d/*.sh; do
   console_debug "Running $file..."
   bash "$file"
@@ -37,11 +35,8 @@ for file in /plasma/post-hooks.d/*.sh; do
 done
 console_ok "Post-init scripts done"
 
-
 shopt -u nullglob
 
-# Start supervisor in daemon mode
-# And manually start services because of dependencies
 
 # Sanity script before running services
 console_info "Running Sanity check script"
@@ -64,3 +59,43 @@ supervisorctl start sunshine
 supervisorctl start wm
 supervisorctl start glmark2
 supervisorctl start steam
+
+# Send notification stating that Plasma is now ready to use
+source /plasma/runtime/boot/notifications.sh
+
+echo '
+                                           0000000000
+                                 000   0000000000000000000
+                              0000  0000000000000000000000000
+                            0000  00000000000000000000000000000
+                          00000 000000000000000000000000000000000        0000000000000000
+                         00000 000000000          000000000000000000000000000000000 000000
+                       000000 0000000                 00000000000000            0000000000
+                      000000 000000                     000000000000             0000000
+                      00000  0000                         00000000000           000000
+                     000000 0000                           00000000000        000000
+                     000000 000                             0000000000     000000
+                    0000000 00                               000000000  000000
+                    0000000 00                               00000000000000
+                    0000000 00                               00000000000
+                   00000000 00                               000000000
+               0000000000000                              00000000000
+            000000  00000000                          000000000000000
+         000000      00000000                    000000     00000000
+      0000000        000000000              000000         00000000 0
+    0000000           0000000000      0000000            00000000  00
+  0000000              00000000000000000               000000000 000
+ 000000000             000000000000                  00000000  0000
+000000 0000000000000000000000000000000    0000000000000000  00000
+ 000000000000000000        000000000000000              00000000
+                             000000000000000000000000000000000
+                               0000000000000000000000000000
+                                  0000000000000000000000
+                                        00000000000
+'
+
+if [[ -z $PLASMA_MANUAL ]]; then
+  console_info "Staying alive!"
+  # Hack to keep the container running
+  tail -f /dev/null
+fi
