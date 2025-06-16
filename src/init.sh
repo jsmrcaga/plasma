@@ -62,4 +62,5 @@ supervisorctl start pulseaudio
 # We want sunshine before steam
 supervisorctl start sunshine
 supervisorctl start wm
+supervisorctl start glmark2
 supervisorctl start steam

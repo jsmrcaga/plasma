@@ -1,0 +1,18 @@
+[program:glmark2]
+priority=100
+
+autostart=false
+startsecs=15
+startretries=0
+autorestart=true
+
+user=%(ENV_USERNAME)s
+directory=%(ENV_HOME)s
+command=glmark2 --fullscreen
+
+; logging
+stdout_logfile=/var/log/glmark.plasma.log
+stdout_logfile_backups=0
+
+stderr_logfile=/var/log/glmark.plasma.error
+stderr_logfile_backups=0
