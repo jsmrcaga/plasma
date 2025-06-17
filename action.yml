@@ -71,7 +71,7 @@ inputs:
   plasma-base:
     required: false
     description: Use 'local' if you want to build the base image here. Only if you want to use a custom base image from a custom repo
-    default: ghcr.io/jsmrcaga/plasma-base
+    default: jsmrcaga/plasma
 
   plasma-version:
     required: false
