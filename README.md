@@ -9,6 +9,53 @@ Essentially a spiritual fork of [docker-steam-headless](https://github.com/Steam
 > If you're looking for the docs or configuration, please take a look
 > at our [wiki in GitHub](https://github.com/jsmrcaga/plasma/wiki)
 
+## Getting started
+The easiest way to get started with Plasma is to run a pre-baked image. We provide
+pre-built images for AMD (`radeon` and `amdgpu` drivers) and the latest 2 NVIDIA drivers.
+
+These images come with sensible defaults, and are pretty much readuy to use.
+
+If you have a specific NVIDIA driver version or wish to modify user/passwords, you'll need
+to build an image. Please refer to the wiki for that: https://github.com/jsmrcaga/plasma/wiki
+
+Plasma should take about 35 to 45 seconds to boot (depending on CPU and priming), and you can
+check the Telegram notifications feature if you want to be notified when it's ready.
+This will also work in case the container restarts.
+
+## Development
+
+> [!IMPORTANT]
+> I sadly don't have enourmous amounts of time for personal projects. If you have
+> an issue, you can of course report it, but it would be extremely beneficial if you
+> open a PR to fix it as well :)
+
+Development of Plasma if pretty straightforward. It's a collection of Dockerfiles and
+boot scripts that run the necessary processes to run games.
+Any time you change something, you need to re-build the image, send it to your
+headless server, and try to run it. It's slow, but works pretty well.
+
+Please consult the [Development Wiki Section](https://github.com/jsmrcaga/plasma/wiki) to know
+more about contributing.
+
+## Versioning
+Plasma versions are based on
+- the actual version of the project
+- the GPU brand
+- the GPU driver version
+
+The `latest` Docker tag will only be used for the base image.
+
+For example, a release may look like this
+* `plasma:latest`: the latest version of the base image
+* `plasma:v2.3.4`: v2.3.4 of the base image
+* `plasma:v2.3.4-AMD-1.0`: v2.3.4 of the AMD image for `radeon` drivers
+* `plasma:v2.3.4-AMD-4.0`: v2.3.4 of the AMD image for `amdgpu` drivers
+* `plasma:v2.3.4-NVIDIA-570.144`: v2.3.4 of the NVIDIA image for driver version 570.144
+
+The main version follows semver, with breaking changes or "big releases" changing the major 
+version, while most releases with new features or non-breaking changes will change the minor version.
+Patch versions will change only for smaller updates.
+
 ## Motivation
 In short, I wanted to play KSP without installing it in my personal machine.
 
@@ -27,8 +74,11 @@ This project should work for you, _if you're willing to tinker and spend some ti
 The main idea of this project is to allow you to build a durable and running image of headless Steam.
 Once that image is proven to work, you should have no more trouble getting it to run. So
 if your server/computer/homelab/supercomputer dies because your little cousin tripped over the
-power cable, you should be safe to jsut reboot the machine and not worry about libraries
+power cable, you should be safe to just reboot the machine and not worry about libraries
 not being up to date or getting a 404 from some driver url.
+
+Note that Steam is a bit different since it auto-updates, but you're free to block that feature
+on your first boot.
 
 ### What this is and isn't
 * This is a different implementation of docker-steam-headless
