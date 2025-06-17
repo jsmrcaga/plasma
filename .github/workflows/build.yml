@@ -5,6 +5,13 @@ on:
     types:
       - opened
       - synchronize
+    paths:
+      - src/**
+      - config/**
+      - '*.Dockerfile'
+      - Dockerfile
+      - .github/workflows/*
+      - action.yml
 
   release:
     types:
