@@ -12,6 +12,8 @@ module repo {
 
   has_wiki = true
 
+  visibility = "public"
+
   actions = {
     secrets = {
       DOCKER_USERNAME = var.github.secrets.docker_username
