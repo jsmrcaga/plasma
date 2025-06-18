@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build:local:amd": "docker build --platform linux/amd64 -t plasma:amd-test --build-arg=AMD_GCN_VERSION=4.0 --build-arg=PLASMA_VERSION=test -f amd.Dockerfile .",
     "build:local:base": "docker build --platform linux/amd64 -t plasma:test --build-arg=SUNSHINE_USERNAME=jsmrcaga --build-arg=SUNSHINE_PASSWORD=test .",
     "build:local:intel": "docker build --platform linux/amd64 -t plasma:intel-test --build-arg=PLASMA_VERSION=test -f intel.Dockerfile .",
