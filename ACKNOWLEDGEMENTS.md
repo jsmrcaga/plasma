@@ -2,6 +2,10 @@
 
 # Direct contribution
 
+* [Josh5](https://github.com/Josh5) and all contributors of docker-steam-headless
+	* For providing an enormous learning opportunity for me, and a lot of solutions to problems found in Plasma.
+	* In the end both projects are quite similar, although Plasma was not forked nor copied
+
 * [GamePlayer-8](https://github.com/GamePlayer-8) & [mentha](https://github.com/mentha)
 	* For [this response](https://github.com/ValveSoftware/steam-for-linux/issues/9731#issuecomment-1632619574), liberating me after 2 weeks of debugging
 
