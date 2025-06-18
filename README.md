@@ -1,13 +1,27 @@
 <h1 align="center">Plasma</h1>
 
-A _very_ lightweight Steam headless implementation.
-Essentially a spiritual fork of [docker-steam-headless](https://github.com/Steam-Headless/docker-steam-headless)
-
 <img alt="Plasma black hole image" src="docs/banner.png"/>
+
+A lightweight and unbloated Steam headless implementation.
+Essentially a spiritual fork of [docker-steam-headless](https://github.com/Steam-Headless/docker-steam-headless)
 
 > [!TIP]
 > If you're looking for the docs or configuration, please take a look
 > at our [wiki in GitHub](https://github.com/jsmrcaga/plasma/wiki)
+
+## What's Plasma
+
+Plasma is a Steam headless Docker image.
+
+It allows you to run and play Steam games from a headless (no monitor) server with a GPU.
+It uses Sunshine and Moonlight to achieve this.
+
+It's meant to be used by people looking specifically for this functionality, and able to develop, maintain and deploy themselves.
+
+If you're here, it's safe to assume you're not looking for pre-made solutions.
+But if Plasma does not fit your needs, please take a look to [some alternative solutions](#alternative-solutions).
+
+If you're looking for Cloud gaming services, take a look at [this section of our wiki](https://github.com/jsmrcaga/plasma/wiki#ready-to-use-platforms)
 
 ## Getting started
 The easiest way to get started with Plasma is to run a pre-baked image. We provide

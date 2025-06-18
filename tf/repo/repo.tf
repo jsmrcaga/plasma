@@ -6,7 +6,7 @@ module repo {
   }
 
   name = "plasma"
-  description = "A very lightweight Steam headless Docker image"
+  description = "A lightweight and unbloated Steam headless Docker image"
 
   topics = ["steam", "sunshine", "gaming", "streaming"]
 
