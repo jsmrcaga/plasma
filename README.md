@@ -27,7 +27,9 @@ If you're looking for Cloud gaming services, take a look at [this section of our
 The easiest way to get started with Plasma is to run a pre-baked image. We provide
 pre-built images for AMD (`radeon` and `amdgpu` drivers) and the latest 2 NVIDIA drivers.
 
-These images come with sensible defaults, and are pretty much readuy to use.
+These images come with sensible defaults, and are pretty much ready to use.
+To get readiness notifications you can talk to [Plasma's Telegram bot](https://t.me/control_plasma_bot) 
+or create your own.
 
 If you have a specific NVIDIA driver version or wish to modify user/passwords, you'll need
 to build an image. Please refer to the wiki for that: https://github.com/jsmrcaga/plasma/wiki
