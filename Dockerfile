@@ -122,8 +122,8 @@ RUN \
 	mkdir -p /tmp/pulse && \
 	chown -R ${PUID}:${PGID} /tmp/pulse && \
 	chmod -R 0770 /tmp/pulse && \
-	# Give user extra groups
-	usermod -aG audio,games,messagebus,video,input,tty ${USERNAME}
+	# Give user extra groups (render is particularly useful for AMD Cloud)
+	usermod -aG audio,games,messagebus,video,render,input,tty ${USERNAME}
 
 # Setup services to run & set them to run under our new user
 # Using supervisord
