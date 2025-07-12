@@ -25,6 +25,10 @@ else
   echo "GCN Version is: $gcn_version; using xorg.amdgpu.conf in /etc/X11/xorg.conf" >> $STDOUT
 fi
 
+if [[ $USE_VIRTIO_DRIVERS == "yes" ]]; then
+	xorg_config="/plasma/config/amd/xorg.virtio.conf"
+fi
+
 # Install drivers
 dpkg --add-architecture i386
 apt-get update

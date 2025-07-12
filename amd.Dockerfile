@@ -14,9 +14,14 @@ LABEL \
 ARG AMD_GCN_VERSION=4.0
 ENV AMD_GCN_VERSION=$AMD_GCN_VERSION
 
+# AMD Cloud uses Virtio
+ARG USE_VIRTIO_DRIVERS=no
+ENV USE_VIRTIO_DRIVERS=$USE_VIRTIO_DRIVERS
+
 # Copy xorg configs before
 COPY ./config/video/xorg/xorg.amdgpu.conf /plasma/config/amd/xorg.amdgpu.conf
 COPY ./config/video/xorg/xorg.radeon.conf /plasma/config/amd/xorg.radeon.conf
+COPY ./config/video/xorg/xorg.virtio.conf /plasma/config/amd/xorg.virtio.conf
 
 # Install drivers
 COPY --chmod=0755 ./src/setup/amd /plasma/setup/amd
