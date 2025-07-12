@@ -86,18 +86,12 @@ jobs:
     strategy:
       matrix:
         gpu-type:
-          # radeon
-          - gpu: AMD
-            driver: "1.0"
           # amdgpu
           - gpu: AMD
             driver: "4.0"
           # Latest prod
           - gpu: NVIDIA
             driver: "570.144"
-          # Legacy
-          - gpu: NVIDIA
-            driver: "470.256.02"
 
     steps:
       - name: Download Cached image
