@@ -51,6 +51,7 @@ RUN apt-get update && \
 		# Allows testing graphics
 		xfishtank \
 		glmark2 \
+		xcvt \
 		# libgbm1 is needed for sunshine but for some reason does not
 		# come with the base sunshine image
 		libgbm1 \
